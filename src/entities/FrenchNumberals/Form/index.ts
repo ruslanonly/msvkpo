@@ -1,0 +1,1 @@
+export { FrenchNumeralsForm, type FrenchNumeralsFormType } from "./ui"

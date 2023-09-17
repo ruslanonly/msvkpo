@@ -1,8 +1,10 @@
-import { ControllerProps, useController } from "react-hook-form";
+import { ControllerProps, FieldValues, useController } from "react-hook-form";
 
-import { Input as MUIINPUT, InputProps } from "@mui/joy";
+import { Input as MUIINPUT, InputProps as MUIInputProps } from "@mui/joy";
 
-export const Input = (props: Omit<InputProps & ControllerProps, "render">) => {
+type InputProps<TFieldValues extends FieldValues> = Omit<MUIInputProps & ControllerProps<TFieldValues>, "render">
+
+export const Input = <TFieldValues extends FieldValues>(props: InputProps<TFieldValues>) => {
   const { field: { ref, onChange, value } } = useController({
     name: props.name,
     control: props.control,
@@ -11,8 +13,9 @@ export const Input = (props: Omit<InputProps & ControllerProps, "render">) => {
 
   return (
     <MUIINPUT 
+    {...props}
     ref={ref}
     onChange={onChange}
-    value={value}/>
+    value={value || ''}/>
   )
 }

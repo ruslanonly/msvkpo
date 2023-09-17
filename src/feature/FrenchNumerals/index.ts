@@ -1,0 +1,1 @@
+export { FrenchNumerals } from "./ui/FrenchNumerals"

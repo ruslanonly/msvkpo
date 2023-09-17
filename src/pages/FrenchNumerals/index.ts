@@ -1,0 +1,1 @@
+export { FrenchNumeralsPage } from "./ui/FrenchNumeralPage"

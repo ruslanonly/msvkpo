@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { ChessOrderPage } from "pages/ChessOrder";
-import { FrenchNumeralPage } from "pages/FrenchNumeral";
+import { FrenchNumeralsPage } from "pages/FrenchNumerals";
 import { Layout } from "entities/Layout";
 
 export function AppRouter() {
@@ -9,7 +9,7 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout/>}>
-          <Route path="/french-numerals" element={<FrenchNumeralPage/>}/>
+          <Route path="/french-numerals" element={<FrenchNumeralsPage/>}/>
           <Route path="/chess-order" element={<ChessOrderPage/>}/>
         </Route>
       </Routes>

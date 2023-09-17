@@ -1,11 +1,12 @@
 .container {
   width: 100%;
+  padding: 0 1rem;
 }
 
 .wrapper {
   margin: 0 auto;
   width: 100%;
-  max-width: 900px;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
 }
@@ -19,9 +20,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1.5rem 0;
+
+  h1 {
+    margin: 0;
+  }
 
   .links {
     display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 2rem;
+  }
+}
+
+@media all and (max-width: 800px) {
+  .nav {
+    .links {
+      flex-direction: column;
+      gap: 0;
+    }
   }
 }

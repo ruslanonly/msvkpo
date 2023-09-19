@@ -1,1 +1,0 @@
-export { frenchWordsToNumber } from "./lib/frenchWordsToString"

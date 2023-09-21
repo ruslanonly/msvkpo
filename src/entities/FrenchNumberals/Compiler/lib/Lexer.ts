@@ -1,42 +1,13 @@
+import { CENT, DIX, FROM_ELEVENT_TO_SIXTEEN, SIMPLE_TENS, UNITS } from "../var/dictionary"
+
 export const enum TokenType {
   Zero,
   Unit, // 1 - 9
-  Quatre, // 4
   Dix, // dix
   FromElevenToSixteen, // (17 | 18 | 19) = Dix + Unit
   SimpleTens, // 20 - 60 (Hard Tend are complex)
   Cent
 }
-
-const UNITS = [
-  "zero",
-  "un",
-  "deux",
-  "trois",
-  "quatre",
-  "cinq",
-  "six",
-  "sept",
-  "huit",
-  "neuf"
-]
-const DIX = "dix"
-const FROM_ELEVENT_TO_SIXTEEN = [
-  "onze",
-  "douze",
-  "treize",
-  "quatorze",
-  "quinze",
-  "seize"
-]
-const SIMPLE_TENS = [
-  "vingt",
-  "trente",
-  "quarante",
-  "cinquante",
-  "soixante"
-]
-const CENT = "cent"
 
 export type Token = {
   type: TokenType,
@@ -73,11 +44,15 @@ export class Lexer {
     let word = '';
     while (this.currentPosition < this.input.length) {
       const char = this.input[this.currentPosition];
-      if (char.match(/[a-z]/)) {
-        word += char;
-        this.currentPosition++;
-      } else {
-        throw new Error(`Неизвестный символ ${char}`)
+
+      if (char === " ") break;
+      else {
+        if (char.match(/[a-z]/)) {
+          word += char;
+          this.currentPosition++;
+        } else {
+          throw new Error(`Неизвестный символ ${char}`)
+        }
       }
     }
     return word;
@@ -90,9 +65,6 @@ export class Lexer {
         switch(true) {
           case word === UNITS[0]: {
             this.addToken(TokenType.Zero, word); break;
-          }
-          case word === UNITS[4]: {
-            this.addToken(TokenType.Quatre, word); break;
           }
           case UNITS.includes(word): {
             this.addToken(TokenType.Unit, word); break;
@@ -107,6 +79,7 @@ export class Lexer {
             this.addToken(TokenType.SimpleTens, word); break;
           }
           case word === CENT: {
+            console.log(word, CENT, word === CENT)
             this.addToken(TokenType.Cent, word); break;
           }
           default: {
@@ -114,7 +87,6 @@ export class Lexer {
           }
         }
       } else {
-        console.error('Неизвестный символ:', this.input[this.currentPosition]);
         this.currentPosition++;
       }
 

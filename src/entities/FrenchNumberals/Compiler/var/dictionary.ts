@@ -24,7 +24,6 @@ export const dictionary: Record<string, number> = {
   "cent": 100,
 };
 
-
 export const UNITS = [
   "zero",
   "un",
@@ -53,5 +52,7 @@ export const SIMPLE_TENS = [
   "cinquante",
   "soixante"
 ]
+export const VINGT = SIMPLE_TENS[0]
+export const VINGTS = VINGT + "s"
 export const SOIXANTE = SIMPLE_TENS[4]
 export const CENT = "cent"

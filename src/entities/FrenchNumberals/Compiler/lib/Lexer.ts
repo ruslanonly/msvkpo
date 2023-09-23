@@ -1,10 +1,11 @@
-import { CENT, DIX, FROM_ELEVENT_TO_SIXTEEN, SIMPLE_TENS, UNITS } from "../var/dictionary"
+import { CENT, DIX, FROM_ELEVENT_TO_SIXTEEN, SIMPLE_TENS, UNITS, VINGTS } from "../var/dictionary"
 
 export const enum TokenType {
   Zero,
   Unit, // 1 - 9
   Dix, // dix
   FromElevenToSixteen, // (17 | 18 | 19) = Dix + Unit
+  Vingts, // 20 mulitples
   SimpleTens, // 20 - 60 (Hard Tend are complex)
   Cent
 }
@@ -75,11 +76,13 @@ export class Lexer {
           case FROM_ELEVENT_TO_SIXTEEN.includes(word): {
             this.addToken(TokenType.FromElevenToSixteen, word); break;
           }
+          case word === VINGTS: {
+            this.addToken(TokenType.Vingts, word); break;
+          }
           case SIMPLE_TENS.includes(word): {
             this.addToken(TokenType.SimpleTens, word); break;
           }
           case word === CENT: {
-            console.log(word, CENT, word === CENT)
             this.addToken(TokenType.Cent, word); break;
           }
           default: {

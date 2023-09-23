@@ -1,6 +1,6 @@
 import { Lexer, Parser } from "entities/FrenchNumberals/Compiler";
 import { FrenchNumeralsForm, FrenchNumeralsFormType } from "entities/FrenchNumberals/Form";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 
@@ -12,14 +12,19 @@ export function FrenchNumerals() {
   })
   const { watch } = methods
 
-  useEffect(() => {
+  const numeral = useMemo(() => {
     const lexer = new Lexer(watch().numeral)
     try {
       const parser = new Parser(lexer.tokenize())
-      console.log('parse', lexer.tokens, parser.parse())
-
-    } catch (error) {
-      console.error(error)
+      const parsed = parser.parse()
+      methods.clearErrors("numeral")
+      return parsed
+    } catch (_error) {
+      const error: Error = _error as Error
+      methods.setError("numeral", {
+        type: "value",
+        message: error.message
+      })
     }
   }, [watch().numeral])
 
@@ -27,9 +32,7 @@ export function FrenchNumerals() {
     <>
       <FrenchNumeralsForm methods={methods}/>
 
-      <div>
-        {watch().numeral}
-      </div>
+      <div>{numeral}</div>
     </>
   )
 }

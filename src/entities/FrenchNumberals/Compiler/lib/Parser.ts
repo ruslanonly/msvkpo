@@ -1,6 +1,5 @@
-import { DIX, FROM_ELEVENT_TO_SIXTEEN, SOIXANTE, UNITS, dictionary } from "../var/dictionary";
+import { CENT, DIX, FROM_ELEVENT_TO_SIXTEEN, SOIXANTE, UNITS, VINGT, dictionary } from "../var/dictionary";
 import { Token, TokenType } from "./Lexer";
-
 
 export class Parser {
   tokens: Token[]
@@ -44,50 +43,142 @@ export class Parser {
     return dictionary[this.tokens[start].value]
   }
 
-  private parseSoixanteCase() {
-    const first = this.tokens[0]
-    const second = this.tokens[1]
-    const third = this.tokens[2]
-
-    if (this.L === 1) {
+  private parseSoixanteCase(start: number) {
+    const first = this.tokens[start + 0]
+    const second = this.tokens[start + 1]
+    console.log(first.value, second.value)
+    if (this.L === start + 1) {
       return 60
-    } else if (this.L === 2) {
+    } else if (this.L === start + 2) {
 
       if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
-        return 60 + dictionary[second.value]
+        return 60 + this.parseFromElevenToSixteen(start + 1)
       } else if (second.value === DIX) {
-        return 60 + dictionary[second.value]
+        return 60 + this.parseDix(start + 1)
       } else throw new Error(`После ${first.value} может идти только 11 - 16 или dix и 7 - 9`) 
 
-    } else if (this.L === 3) {
+    } else if (this.L === start + 3) {
 
       if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
-        return 60 + dictionary[second.value]
+        return 60 + this.parseFromElevenToSixteen(start + 1)
       } else if (second.value === DIX) {
-        if (UNITS.slice(-3).includes(third.value)) return 60 + 10 + dictionary[third.value]
-        else throw new Error("После dix должна быть единица (7 - 9)")
+        return 60 + this.parseDix(start + 1)
       } else throw new Error(`После ${first.value} может идти только 11 - 16 или dix и 7 - 9`)
 
     }
 
-    this.expectTokensLength(3, `После dix ${second?.value} не может быть слов`)
+    this.expectTokensLength(start + 3, `После dix ${second?.value} не может быть слов`)
 
     return 0
   }
 
-  private parseSimpleTensCase() {
-    const first = this.tokens[0]
-    const second = this.tokens[1]
+  private parseSimpleTensCase(start: number) {
+    const first = this.tokens[start + 0]
+    const second = this.tokens[start + 1]
 
-    if (this.L === 1) return dictionary[first.value]
-    else if (this.L === 2) {
+    if (this.L === start + 1) return dictionary[first.value]
+    else if (this.L === start + 2) {
       if (second.type === TokenType.Unit) return dictionary[first.value] + dictionary[second.value]
       else throw new Error(`После десятков (20 - 60) не должно быть слова ${second.value}`)
     }
 
-    this.expectTokensLength(2, `После ${first.value} ${second.value} не может быть слов`)
+    this.expectTokensLength(start + 2, `После ${first.value} ${second.value} не может быть слов`)
 
     return 0
+  }
+
+  private parseQuatreCase(start: number) {
+    const second = this.tokens[start + 1]
+    const third = this.tokens[start + 2]
+    if (this.L === start + 1) {
+      return 4
+    } else if (this.L === start + 2) {
+
+      if (second.type === TokenType.Vingts) return 80
+      else if (second.value === VINGT) throw new Error("После vingts должны быть единицы или 10 - 19")
+      else if (second.value === CENT) return 400
+      throw new Error(`После quatre не может идти числительного ${second.value}`)
+
+    } else {
+
+      if (second.type === TokenType.Vingts) return 80
+      else if (second.value === VINGT) {
+        if (third.type === TokenType.Unit) {
+          this.expectTokensLength(start + 3, `После ${third.value} не может быть слов`)
+          return 80 + dictionary[third.value]
+        } else if (third.type === TokenType.FromElevenToSixteen) {
+            return 80 + this.parseFromElevenToSixteen(start + 2)
+        } else if (third.value === DIX) {
+            return 80 + this.parseDix(start + 2)
+        }
+        else throw new Error(`После vingt не может идти ${third.value}`)
+      } else if (second.value === CENT) return 400
+      else throw new Error(`После quatre не может идти числительного ${second.value}`)
+
+    }
+  }
+  
+  private parseUnitCase(start: number) {
+    const first = this.tokens[start]
+    const second = this.tokens[start + 1]
+    const third = this.tokens[start + 2]
+    if (this.L === start + 1) {
+      this.expectTokensLength(start + 1, "После единиц не может быть слов")
+      return dictionary[first.value]
+    } else {
+      let value = 0;
+
+      if (start === 0 && first.value === UNITS[1]) throw new Error("После un не может быть слов")
+
+      if (second.type !== TokenType.Cent) throw new Error("После единиц должен быть cent (сотня)")
+      
+      value = dictionary[first.value] * 100
+      if (this.L === start + 2) return value
+
+      switch(third.type) {
+        case TokenType.Dix: {
+          value += this.parseDix(start + 2)
+          break;
+        }
+        case TokenType.FromElevenToSixteen: {
+          value += this.parseFromElevenToSixteen(start + 2)
+          break;
+        }
+        case TokenType.Unit: {
+          switch(third.value) {
+            case UNITS[4]: {
+              value += this.parseQuatreCase(start + 2)
+              break;
+            }
+            default: {
+              value += this.parseUnitCase(start + 2)
+              break;
+            }
+          }
+          break;
+        }
+        case TokenType.SimpleTens: {
+  
+          switch(first.value) {
+            case SOIXANTE: {
+              value += this.parseSoixanteCase(start + 2)
+              break;
+            }
+            default: {
+              value += this.parseSimpleTensCase(start + 2)
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      return value
+    }
+  }
+
+  parseCentCase() {
+    
   }
 
   parse() {
@@ -118,6 +209,11 @@ export class Parser {
       case TokenType.Unit: {
         switch(first.value) {
           case UNITS[4]: {
+            value = this.parseQuatreCase(0)
+            break;
+          }
+          default: {
+            value = this.parseUnitCase(0)
             break;
           }
         }
@@ -127,11 +223,11 @@ export class Parser {
 
         switch(first.value) {
           case SOIXANTE: {
-            value = this.parseSoixanteCase()
+            value = this.parseSoixanteCase(0)
             break;
           }
           default: {
-            value = this.parseSimpleTensCase()
+            value = this.parseSimpleTensCase(0)
             break;
           }
         }

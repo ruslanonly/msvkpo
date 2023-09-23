@@ -101,7 +101,10 @@ export class Parser {
 
     } else {
 
-      if (second.type === TokenType.Vingts) return 80
+      if (second.type === TokenType.Vingts) {
+        this.expectTokensLength(start + 2, `После vingts не может быть слов`)
+        return 80
+      }
       else if (second.value === VINGT) {
         if (third.type === TokenType.Unit) {
           this.expectTokensLength(start + 3, `После ${third.value} не может быть слов`)
@@ -112,7 +115,7 @@ export class Parser {
             return 80 + this.parseDix(start + 2)
         }
         else throw new Error(`После vingt не может идти ${third.value}`)
-      } else if (second.value === CENT) return 400
+      } else if (second.value === CENT) return this.parseCentCase(start + 1, 4)
       else throw new Error(`После quatre не может идти числительного ${second.value}`)
 
     }
@@ -121,7 +124,7 @@ export class Parser {
   private parseUnitCase(start: number) {
     const first = this.tokens[start]
     const second = this.tokens[start + 1]
-    const third = this.tokens[start + 2]
+
     if (this.L === start + 1) {
       this.expectTokensLength(start + 1, "После единиц не может быть слов")
       return dictionary[first.value]
@@ -132,26 +135,39 @@ export class Parser {
 
       if (second.type !== TokenType.Cent) throw new Error("После единиц должен быть cent (сотня)")
       
-      value = dictionary[first.value] * 100
-      if (this.L === start + 2) return value
+      value = this.parseCentCase(start + 1, dictionary[first.value])
+      return value
+    }
+  }
 
-      switch(third.type) {
+  parseCentCase(start: number, multiplyHundred: number) {
+    let value = 0
+
+    const first = this.tokens[start]
+    const second = this.tokens[start + 1]
+
+      if (first.type !== TokenType.Cent) throw new Error("После единиц должен быть cent (сотня)")
+      
+      value = multiplyHundred * 100
+      if (this.L === start + 1) return value
+
+      switch(second.type) {
         case TokenType.Dix: {
-          value += this.parseDix(start + 2)
+          value += this.parseDix(start + 1)
           break;
         }
         case TokenType.FromElevenToSixteen: {
-          value += this.parseFromElevenToSixteen(start + 2)
+          value += this.parseFromElevenToSixteen(start + 1)
           break;
         }
         case TokenType.Unit: {
-          switch(third.value) {
+          switch(second.value) {
             case UNITS[4]: {
-              value += this.parseQuatreCase(start + 2)
+              value += this.parseQuatreCase(start + 1)
               break;
             }
             default: {
-              value += this.parseUnitCase(start + 2)
+              value += this.parseUnitCase(start + 1)
               break;
             }
           }
@@ -172,13 +188,7 @@ export class Parser {
           break;
         }
       }
-
-      return value
-    }
-  }
-
-  parseCentCase() {
-    
+    return value
   }
 
   parse() {
@@ -203,7 +213,7 @@ export class Parser {
         break;
       }
       case TokenType.Cent: {
-        value = 100;
+        value = this.parseCentCase(0, 1);
         break;
       }
       case TokenType.Unit: {

@@ -21,7 +21,7 @@ export class Lexer {
   private currentPosition: number
 
   constructor(input: string) {
-    this.input = input.trim().toLowerCase(); // Приводим к нижнему регистру для унификации
+    this.input = input.replace(/-/g, ' ').trim().toLowerCase(); // Приводим к нижнему регистру для унификации
     this.tokens = [];
     this.currentPosition = 0;
   }
@@ -60,10 +60,14 @@ export class Lexer {
   }
 
   tokenize() {
+    if (!this.input) return []
     while (this.currentPosition < this.input.length) {
       const word = this.parseWord();
       if (word) {
         switch(true) {
+          case word === "et": {
+            break;
+          }
           case word === UNITS[0]: {
             this.addToken(TokenType.Zero, word); break;
           }

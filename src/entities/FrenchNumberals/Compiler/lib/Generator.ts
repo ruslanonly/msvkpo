@@ -1,12 +1,15 @@
-import { Token } from "./Lexer";
+import { Parser } from "..";
+import { Lexer } from "./Lexer";
 
 export class Generator {
-  generate(parsedNumber: Token[]) {
+  generate(input: string) {
+    if (!input) return
+
+    const lexer = new Lexer(input)
+    const tokens = lexer.tokenize()
     
-  }
-
-  // Метод для преобразования текстового числа в числовое значение
-  getNumberValue(textNumber: string) {
-
+    const parser = new Parser(tokens)
+    const parsed = parser.parse()
+    return parsed
   }
 }

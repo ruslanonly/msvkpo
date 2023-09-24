@@ -1,0 +1,1 @@
+export { SentenceMoving } from "./ui/SentenceMoving"

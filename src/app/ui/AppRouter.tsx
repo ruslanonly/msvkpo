@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { ChessOrderPage } from "pages/ChessOrder";
+import { SentenceMovingPage } from "pages/SentenceMoving";
 import { FrenchNumeralsPage } from "pages/FrenchNumerals";
 import { Layout } from "entities/Layout";
 
@@ -10,7 +10,7 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<Layout/>}>
           <Route path="/french-numerals" element={<FrenchNumeralsPage/>}/>
-          <Route path="/chess-order" element={<ChessOrderPage/>}/>
+          <Route path="/sentence-moving" element={<SentenceMovingPage/>}/>
         </Route>
       </Routes>
     </BrowserRouter>

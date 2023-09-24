@@ -46,20 +46,20 @@ export class Parser {
   private parseSoixanteCase(start: number) {
     const first = this.tokens[start + 0]
     const second = this.tokens[start + 1]
-    console.log(first.value, second.value)
+
     if (this.L === start + 1) {
       return 60
     } else if (this.L === start + 2) {
-
-      if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
+      if (second.type === TokenType.Unit) return dictionary[first.value] + dictionary[second.value]
+      else if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
         return 60 + this.parseFromElevenToSixteen(start + 1)
       } else if (second.value === DIX) {
         return 60 + this.parseDix(start + 1)
       } else throw new Error(`После ${first.value} может идти только 11 - 16 или dix и 7 - 9`) 
 
     } else if (this.L === start + 3) {
-
-      if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
+      if (second.type === TokenType.Unit) return dictionary[first.value] + dictionary[second.value]
+      else if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
         return 60 + this.parseFromElevenToSixteen(start + 1)
       } else if (second.value === DIX) {
         return 60 + this.parseDix(start + 1)
@@ -146,48 +146,50 @@ export class Parser {
     const first = this.tokens[start]
     const second = this.tokens[start + 1]
 
-      if (first.type !== TokenType.Cent) throw new Error("После единиц должен быть cent (сотня)")
-      
-      value = multiplyHundred * 100
-      if (this.L === start + 1) return value
+    if (first.type !== TokenType.Cent) throw new Error("После единиц должен быть cent (сотня)")
+    
+    value = multiplyHundred * 100
+    if (this.L === start + 1) return value
 
-      switch(second.type) {
-        case TokenType.Dix: {
-          value += this.parseDix(start + 1)
-          break;
-        }
-        case TokenType.FromElevenToSixteen: {
-          value += this.parseFromElevenToSixteen(start + 1)
-          break;
-        }
-        case TokenType.Unit: {
-          switch(second.value) {
-            case UNITS[4]: {
-              value += this.parseQuatreCase(start + 1)
-              break;
-            }
-            default: {
-              value += this.parseUnitCase(start + 1)
-              break;
-            }
-          }
-          break;
-        }
-        case TokenType.SimpleTens: {
-  
-          switch(first.value) {
-            case SOIXANTE: {
-              value += this.parseSoixanteCase(start + 2)
-              break;
-            }
-            default: {
-              value += this.parseSimpleTensCase(start + 2)
-              break;
-            }
-          }
-          break;
-        }
+    switch(second.type) {
+      case TokenType.Dix: {
+        value += this.parseDix(start + 1)
+        break;
       }
+      case TokenType.FromElevenToSixteen: {
+        value += this.parseFromElevenToSixteen(start + 1)
+        break;
+      }
+      case TokenType.Unit: {
+        switch(second.value) {
+          case UNITS[4]: {
+            value += this.parseQuatreCase(start + 1)
+            break;
+          }
+          default: {
+            value += this.parseUnitCase(start + 1)
+            break;
+          }
+        }
+        break;
+      }
+      case TokenType.SimpleTens: {
+        switch(second.value) {
+          case SOIXANTE: {
+            value += this.parseSoixanteCase(start + 1)
+            break;
+          }
+          default: {
+            value += this.parseSimpleTensCase(start + 1)
+            break;
+          }
+        }
+        break;
+      }
+      default: {
+        throw new Error(`После сотни не может идти слово ${second.value}`)
+      }
+    }
     return value
   }
 

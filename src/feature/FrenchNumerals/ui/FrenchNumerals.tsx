@@ -1,8 +1,9 @@
-import { Lexer, Parser } from "entities/FrenchNumberals/Compiler";
+import { Generator } from "entities/FrenchNumberals/Compiler";
 import { FrenchNumeralsForm, FrenchNumeralsFormType } from "entities/FrenchNumberals/Form";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
+import styles from "./FrenchNumerals.module.less"
 
 export function FrenchNumerals() {
   const methods = useForm<FrenchNumeralsFormType>({
@@ -10,15 +11,18 @@ export function FrenchNumerals() {
       numeral: ''
     }
   })
-  const { watch } = methods
+
+
+  const { watch, formState: { errors } } = methods
+
+  const { numeral: numeralInput } = watch()
 
   const numeral = useMemo(() => {
-    const lexer = new Lexer(watch().numeral)
+    const generator = new Generator()
     try {
-      const parser = new Parser(lexer.tokenize())
-      const parsed = parser.parse()
+      const generated = generator.generate(numeralInput)
       methods.clearErrors("numeral")
-      return parsed
+      return generated
     } catch (_error) {
       const error: Error = _error as Error
       methods.setError("numeral", {
@@ -26,13 +30,15 @@ export function FrenchNumerals() {
         message: error.message
       })
     }
-  }, [watch().numeral])
+  }, [numeralInput, methods])
 
   return (
     <>
       <FrenchNumeralsForm methods={methods}/>
 
-      <div>{numeral}</div>
+      <div className={styles['number-wrapper']}>
+        {!errors.numeral && <span className={styles.number}>{numeral}</span>}
+      </div>
     </>
   )
 }

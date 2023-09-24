@@ -1,1 +1,0 @@
-export { chessBothSequences } from "./lib"

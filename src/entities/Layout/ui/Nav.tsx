@@ -10,7 +10,7 @@ export function Nav() {
       </div>
       <div className={styles.links}>
         <Link to="/french-numerals"><A level="title-lg">Практическая работа 1</A></Link>
-        <Link to="/chess-order"><A level="title-lg">Практическая работа 2</A></Link>
+        <Link to="/sentence-moving"><A level="title-lg">Практическая работа 2</A></Link>
       </div>
     </div>
   )

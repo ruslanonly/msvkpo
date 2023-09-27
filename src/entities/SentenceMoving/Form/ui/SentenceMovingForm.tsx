@@ -5,8 +5,8 @@ import styles from "./SentenceMovingForm.module.less"
 
 export type SentenceMovingFormType = {
   sentence: string,
-  a: string
-  b: string
+  a: number
+  b: number
 }
 
 type SentenceMovingFormProps = {
@@ -15,7 +15,7 @@ type SentenceMovingFormProps = {
 
 export function SentenceMovingForm(props: SentenceMovingFormProps) {
   const { control, formState: { errors }, watch } = props.methods
-  const { a, b, sentence } = watch()
+  const { sentence } = watch()
   return (
     <div>
       <FormItem 
@@ -30,18 +30,13 @@ export function SentenceMovingForm(props: SentenceMovingFormProps) {
         <FormItem 
         top="A"
         bottom="Номер слова, с которого начинается последовальность, которая переставляется в начало предложения"
-        error={errors.b?.message || ''}>
+        error={errors.a?.message || ''}>
           <Input
           disabled={!sentence?.length}
           type="number"
           placeholder="Напишите что-нибудь..."
           name="a"
-          control={control}
-          rules={{
-            validate: (value) => value < b,
-            min: {value: 1, message: "Число должно быть больше 0"},
-            max: {value: sentence ? sentence.length : 0, message: "Число B не может быть больше количества слов в предложении"}
-          }}/>
+          control={control}/>
         </FormItem>
 
         <FormItem 
@@ -53,11 +48,7 @@ export function SentenceMovingForm(props: SentenceMovingFormProps) {
           type="number"
           placeholder="Напишите что-нибудь..."
           name="b"
-          control={control}
-          rules={{
-            validate: (value) => value > a,
-            min: {value: 1, message: "Число должно быть больше 0"},
-          }}/>
+          control={control}/>
         </FormItem>
       </div>
     </div>

@@ -38,7 +38,7 @@ export class Parser {
   private parseFromElevenToSixteen(start: number) {
     const second = this.tokens[start + 1]
 
-    this.expectTokensLength(start + 2, `После dix ${second?.value} не может быть слов`)
+    this.expectTokensLength(start + 1, `После dix ${second?.value} не может быть слов`)
 
     return dictionary[this.tokens[start].value]
   }
@@ -49,22 +49,30 @@ export class Parser {
 
     if (this.L === start + 1) {
       return 60
-    } else if (this.L === start + 2) {
-      if (second.type === TokenType.Unit) return dictionary[first.value] + dictionary[second.value]
+    } 
+    else if (this.L === start + 2) {
+      if (second.type === TokenType.Unit) {
+        this.expectTokensLength(start + 2, `После ${second.value} не может быть слов`)
+        return dictionary[first.value] + dictionary[second.value]
+      }
       else if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
+        this.expectTokensLength(start + 2, `После ${second.value} не может быть слов`)
         return 60 + this.parseFromElevenToSixteen(start + 1)
       } else if (second.value === DIX) {
+        this.expectTokensLength(start + 2, `После ${second.value} не может быть слов`)
         return 60 + this.parseDix(start + 1)
       } else throw new Error(`После ${first.value} может идти только 11 - 16 или dix и 7 - 9`) 
-
-    } else if (this.L === start + 3) {
-      if (second.type === TokenType.Unit) return dictionary[first.value] + dictionary[second.value]
+    } 
+    else if (this.L === start + 3) {
+      if (second.type === TokenType.Unit) {
+        this.expectTokensLength(start + 2, `После ${second.value} не может быть слов`)
+        return dictionary[first.value] + dictionary[second.value]
+      }
       else if (FROM_ELEVENT_TO_SIXTEEN.includes(second.value)) {
         return 60 + this.parseFromElevenToSixteen(start + 1)
       } else if (second.value === DIX) {
         return 60 + this.parseDix(start + 1)
       } else throw new Error(`После ${first.value} может идти только 11 - 16 или dix и 7 - 9`)
-
     }
 
     this.expectTokensLength(start + 3, `После dix ${second?.value} не может быть слов`)

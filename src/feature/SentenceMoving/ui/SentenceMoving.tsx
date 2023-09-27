@@ -12,10 +12,32 @@ export function SentenceMoving() {
   const { a, b, sentence } = watch()
 
   const resultedSentence = useMemo(() => {
-    const start = parseInt(a), end = parseInt(b) 
+    const wordsAmount = sentence.split(" ").length
+    const start = parseInt(a as unknown as string), end = parseInt(b as unknown as string) 
 
-    if (!isNaN(start) && !isNaN(end) && sentence) 
-    return moveSentencePart(sentence, start, end)
+    if (!isNaN(start) && !isNaN(end) && sentence) {
+      let isError = false
+      if (start < 1) {
+        isError = true
+        methods.setError("a", {message: "А должно быть больше 0"})
+      }
+      if (end < 1) {
+        isError = true
+        methods.setError("b", {message: "B должно быть больше 0"})
+      }
+      if (end > wordsAmount) {
+        isError = true
+        methods.setError("b", { message: "Число B не может быть больше количества слов" })
+      }
+      if (start >= end) {
+        isError = true
+        methods.setError("a", {message: "A должно быть меньше B"})
+        methods.setError("b", {message: "B должно быть больше A"})
+      }
+      if (isError) return ''
+      methods.clearErrors()
+      return moveSentencePart(sentence, start, end)
+    }
     
   }, [sentence, a, b])
 
@@ -27,9 +49,8 @@ export function SentenceMoving() {
 
       <FormItem top='Результат'>
         <Textarea
-        disabled
         value={resultedSentence}
-        variant='solid'/>
+        variant='plain'/>
       </FormItem>
     </>
   )

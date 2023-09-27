@@ -16,6 +16,6 @@ export const Input = <TFieldValues extends FieldValues>(props: InputProps<TField
     {...props}
     ref={ref}
     onChange={onChange}
-    value={value || ''}/>
+    value={value}/>
   )
 }
